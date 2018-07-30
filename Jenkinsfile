@@ -1,41 +1,42 @@
 pipeline {
     agent any
-    tools {
-        maven 'maven-3.5.4'
+
+    parameters {
+         string(name: 'tomcat_dev', defaultValue: '35.166.210.154', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '34.209.233.6', description: 'Production Server')
     }
-    stages{
+
+    triggers {
+         pollSCM('* * * * *')
+     }
+
+stages{
         stage('Build'){
             steps {
                 sh 'mvn clean package'
             }
             post {
-                success{
+                success {
                     echo 'Now Archiving...'
                     archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
         }
-        stage('Deploy to Staging'){
-            steps {
-                build job: 'webapp-deploy-to-staging'
-            }
-        }
-        stage('Deploy to Production'){
-             steps{
-                 timeout(time:5, unit:'DAYS'){
-                     input message:'Approve PRDUCTION Deployment'
-                 }
 
-                 build job: 'webapp-deploy-to-production'
-             }
-             post {
-                 success{
-                     echo 'Code deployed to Production'
-                 }
-                 failure {
-                     echo 'Deployment Failed.'
-                 }
-             }
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat7/webapps"
+                    }
+                }
+            }
         }
     }
 }
