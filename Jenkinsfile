@@ -30,13 +30,13 @@ stages{
             parallel{
                 stage ('Deploy to Staging'){
                     steps {
-                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem /Users/ferdieculibao/.jenkins/workspace/FullyAutomated/target/*.war ec2-user@${params.tomcat_dev}:/opt/tomcat/webapps"
+                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem **/target/*.war ec2-user@${params.tomcat_dev}:/opt/tomcat/webapps"
                     }
                 }
 
                 stage ("Deploy to Production"){
                     steps {
-                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem /Users/ferdieculibao/.jenkins/workspace/FullyAutomated/target/*.war ec2-user@${params.tomcat_prod}:/opt/tomcat/webapps"
+                        sh "scp -i /Users/ferdieculibao/Documents/CONN/inan01.pem **/target/*.war ec2-user@${params.tomcat_prod}:/opt/tomcat/webapps"
                     }
                 }
             }
