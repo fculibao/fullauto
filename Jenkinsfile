@@ -2,6 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'maven-3.5.4'
+    }
 
     parameters {
          string(name: 'tomcat_dev', defaultValue: '35.173.49.29', description: 'Staging Server')
@@ -42,4 +43,4 @@ stages{
         }
     }
 }
-}
+
